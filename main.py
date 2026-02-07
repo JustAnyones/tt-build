@@ -123,8 +123,6 @@ def optimize_json(config: Config, f: BufferedReader) -> str:
 
 def create_archive(
     config: Config,
-    input_directory: str,
-    output_directory: str,
     manifest: dict[str, Any]
 ) -> str:
     # Create archive name based on manifest title and version
@@ -138,12 +136,12 @@ def create_archive(
     files_to_remove_from_archive: list[str] = []
 
     # Go over each file, optimize it and put it in a zip
-    for dirname, _, files in os.walk(input_directory):
+    for dirname, _, files in os.walk(config.input_directory):
         for filename in files:
             # Get absolute path of the file
             src_abs_file_path = os.path.join(dirname, filename)
             # Get relative path of the file to the input directory, so we can preserve the folder structure in the archive
-            src_rel_file_path = os.path.relpath(os.path.join(dirname, filename), input_directory)
+            src_rel_file_path = os.path.relpath(os.path.join(dirname, filename), config.input_directory)
             # Path where the processed file will be stored temporarily before being added to the archive
             temp_file_path = os.path.join(tmp_build_directory, src_rel_file_path)
 
@@ -174,7 +172,7 @@ def create_archive(
                 logger.info(f"Optimizing plugin.manifest file: {src_abs_file_path}")
                 if "thumbnail" in manifest:
                     # Mark thumbnail for removal from archive
-                    thumbnail_path = os.path.join(input_directory, manifest["thumbnail"])
+                    thumbnail_path = os.path.join(config.input_directory, manifest["thumbnail"])
                     if os.path.exists(thumbnail_path):
                         files_to_remove_from_archive.append(thumbnail_path)
                     del manifest["thumbnail"]
@@ -198,7 +196,7 @@ def create_archive(
 
 
     # Open the zip file for writing and add all the files to it, preserving the folder structure
-    zf = zipfile.ZipFile(os.path.join(output_directory, archive_name), "w")
+    zf = zipfile.ZipFile(os.path.join(config.output_directory, archive_name), "w")
     for src_path, dst_path in files_to_include:
         if src_path in files_to_remove_from_archive:
             logger.info(f"Skipping file marked for removal: {src_path}")
@@ -210,7 +208,7 @@ def create_archive(
     # Clean up temporary build directory
     shutil.rmtree(tmp_build_directory)
 
-    return os.path.join(output_directory, archive_name)
+    return os.path.join(config.output_directory, archive_name)
 
 
 
@@ -240,14 +238,9 @@ def main():
     except ValueError:
         logger.error(f"Unsupported output format: {args.output_format}. Supported formats are: " + ", ".join(SUPPORTED_OUTPUT_FORMATS))
         sys.exit(1)
-    config = Config(
-        input_directory=args.input_directory,
-        output_directory=args.output_directory,
-        output_format=output_format,
-    )
-
+    
     # Get plugin directory and check if it exists
-    plugin_dir = os.path.abspath(config.input_directory)
+    plugin_dir: str = os.path.abspath(args.input_directory)
     if not os.path.exists(plugin_dir):
         logger.error(f"Directory {plugin_dir} does not exist.")
         sys.exit(1)
@@ -266,12 +259,17 @@ def main():
             sys.exit(1)
 
     # Create output directory if it doesn't exist
-    output_dir = os.path.abspath(config.output_directory)
+    output_dir: str = os.path.abspath(args.output_directory)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     
+    config = Config(
+        input_directory=plugin_dir,
+        output_directory=output_dir,
+        output_format=output_format,
+    )
     logger.info(f"Processing plugin: {manifest['title']} (version {manifest['version']})")
-    archive_path = create_archive(config, plugin_dir, output_dir, manifest)
+    archive_path = create_archive(config, manifest)
     logger.info(f"Archive created at: {archive_path}")
 
 if __name__ == "__main__":
