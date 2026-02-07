@@ -4,3 +4,8 @@
 !.git/
 !.git/**
 !README.md
+!.python-version
+!pyproject.toml
+!tt_build/
+!tt_build/__init__.py
+!tt_build/cli.py

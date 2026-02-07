@@ -19,14 +19,27 @@ cd tt-build
 ```
 
 Requirements:
-- Python 3
+- Python 3.12 or higher
+
+Build and install:
+
+```bash
+python -m build --wheel --no-isolation
+python -m installer dist/*.whl
+```
 
 ## Usage
 
-Basic usage:
+After installation:
 
 ```bash
-python main.py -i ~/TheoTown/plugins/dsa -o ~/TheoTown/exported-plugins
+tt-build -i ~/TheoTown/plugins/dsa -o ~/TheoTown/exported-plugins
+```
+
+Or run directly without installation:
+
+```bash
+python tt_build/cli.py -i ~/TheoTown/plugins/dsa -o ~/TheoTown/exported-plugins
 ```
 
 ### Command-Line Options

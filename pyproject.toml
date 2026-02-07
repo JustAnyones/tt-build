@@ -1,0 +1,14 @@
+[project]
+name = "tt-build"
+version = "0.1.0"
+description = "A tool to produce optimized plugin archives for TheoTown"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+tt-build = "tt_build.cli:main"
