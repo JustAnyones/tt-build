@@ -275,7 +275,7 @@ def main():
     logger.info("Plugin Version: %s", manifest["version"])
     logger.info("Plugin Name: %s", manifest["title"])
     logger.info("Plugin Description: %s", manifest["text"])
-    logger.info("Plugin Thumbnail Path: %s", manifest["icon"])
+    logger.info("Plugin Thumbnail Path: %s", manifest["thumbnail"] if "thumbnail" in manifest else "No thumbnail")
     if "min version" in manifest:
         logger.info("Plugin Minimum TheoTown Version: %s", manifest["min version"])
 
