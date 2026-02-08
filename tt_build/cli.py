@@ -23,7 +23,7 @@ class OutputFormat(enum.Enum):
 SUPPORTED_OUTPUT_FORMATS = [format.value for format in OutputFormat]
 TEMP_BUILD_DIR = "temp_build"
 
-IGNORED_EXTENSIONS = [".py", ".md", ".sh"]
+IGNORED_EXTENSIONS = [".py", ".md", ".sh", ".pdn", ".xcf"]
 
 @dataclass
 class Config:
