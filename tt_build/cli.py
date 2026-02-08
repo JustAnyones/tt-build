@@ -119,7 +119,7 @@ def optimize_json(config: Config, f: BufferedReader) -> str:
             arr_obj["mute lua"] = True
             logger.info(f"{plugin_id}: muted Lua")
 
-    return json.dumps(data, ensure_ascii=False)
+    return json.dumps(data, ensure_ascii=False, separators=(',', ':'))
 
 def create_archive(
     config: Config,
@@ -178,7 +178,7 @@ def create_archive(
                     del manifest["thumbnail"]
                     logger.info("Removed thumbnail from plugin.manifest")
                 with open(temp_file_path, "w") as f:
-                    json.dump(manifest, f, ensure_ascii=False)
+                    json.dump(manifest, f, separators=(',', ':'))
                 files_to_include.append((temp_file_path, src_rel_file_path))
                 continue
 
@@ -271,6 +271,13 @@ def main():
     logger.info(f"Processing plugin: {manifest['title']} (version {manifest['version']})")
     archive_path = create_archive(config, manifest)
     logger.info(f"Archive created at: {archive_path}")
+    # Print out manifest content so it can be cleanly copy-pasted to the plugin store
+    logger.info("Plugin Version: %s", manifest["version"])
+    logger.info("Plugin Name: %s", manifest["title"])
+    logger.info("Plugin Description: %s", manifest["text"])
+    logger.info("Plugin Thumbnail Path: %s", manifest["icon"])
+    if "min version" in manifest:
+        logger.info("Plugin Minimum TheoTown Version: %s", manifest["min version"])
 
 if __name__ == "__main__":
     main()
